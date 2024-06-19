@@ -1,0 +1,29 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Tuples Test
+      id: tuples-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Tuples Test
+        setup-command: ''
+        command: python test_script.py
+        timeout: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TUPLES-TEST_RESULTS: "${{steps.tuples-test.outputs.result}}"
+      with:
+        runners: tuples-test
